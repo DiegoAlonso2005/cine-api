@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: cine-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_SSL
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cine-database
+          property: connectionString
+
+databases:
+  - name: cine-database
+    plan: free
+    databaseName: cine_db
+    user: cine_user
+    postgresMajorVersion: 17
+
