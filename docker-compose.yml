@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: cine_user
-      POSTGRES_PASSWORD: cine_local_2026
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copia .env.example a .env y define POSTGRES_PASSWORD}
       POSTGRES_DB: cine_db
     ports:
       - "5432:5432"
@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3000
-      DATABASE_URL: postgres://cine_user:cine_local_2026@database:5432/cine_db
+      DATABASE_URL: postgres://cine_user:${POSTGRES_PASSWORD}@database:5432/cine_db
       DB_SSL: "false"
     ports:
       - "3000:3000"
@@ -44,4 +44,3 @@ networks:
   cine-network:
     name: cine-api-network
     driver: bridge
-
