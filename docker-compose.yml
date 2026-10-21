@@ -1,0 +1,47 @@
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: cine-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cine_user
+      POSTGRES_PASSWORD: cine_local_2026
+      POSTGRES_DB: cine_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - cine_postgres_data:/var/lib/postgresql/data
+    networks:
+      cine-network:
+        aliases:
+          - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cine_user -d cine_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  movies:
+    build: .
+    container_name: cine-movies
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://cine_user:cine_local_2026@database:5432/cine_db
+      DB_SSL: "false"
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - cine-network
+
+volumes:
+  cine_postgres_data:
+
+networks:
+  cine-network:
+    name: cine-api-network
+    driver: bridge
+
